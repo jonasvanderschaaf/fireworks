@@ -1,10 +1,10 @@
 use std::f64;
-use std::ops::{Add, AddAssign, Mul, Sub};
+use std::ops::{Add, AddAssign, Sub};
 
 use js_sys::Math;
 use web_sys::CanvasRenderingContext2d;
 
-use super::GRAVITY;
+const GRAVITY: TwoVec = TwoVec::new(0., 0.07);
 
 #[derive(Clone, Copy)]
 pub struct TwoVec {
@@ -13,24 +13,29 @@ pub struct TwoVec {
 }
 
 impl TwoVec {
+    /* Create TwoVec with given x and y coordinates. */
     pub const fn new(x: f64, y: f64) -> Self {
         Self { x, y }
     }
 
-    pub fn random(speed: f64) -> Self {
+    /* Create a vector with random direction and given magnitude. */
+    pub fn random(magnitude: f64) -> Self {
         let phi = Math::random() * f64::consts::TAU;
 
-        Self::new(phi.cos() * speed, phi.sin() * speed)
+        Self::new(phi.cos() * magnitude, phi.sin() * magnitude)
     }
 
+    /* Get the x coordinate. */
     pub const fn x(&self) -> f64 {
         self.x
     }
 
+    /* Get the y coordinate. */
     pub const fn y(&self) -> f64 {
         self.y
     }
 
+    /* Get a zero vector. */
     pub const fn zero() -> Self {
         Self { x: 0., y: 0. }
     }
@@ -64,23 +69,13 @@ impl Sub for TwoVec {
     }
 }
 
-impl Mul<f64> for &TwoVec {
-    type Output = TwoVec;
-
-    fn mul(self, rhs: f64) -> TwoVec {
-        TwoVec {
-            x: self.x * rhs,
-            y: self.y * rhs,
-        }
-    }
-}
-
 impl Into<(f64, f64)> for &TwoVec {
     fn into(self) -> (f64, f64) {
         (self.x, self.y)
     }
 }
 
+/* Convert an rgb triple and alpha value to a CSS colour. */
 fn rgba_to_color(rgb: (u8, u8, u8), alpha: f64) -> String {
     format!(
         "rgba({},{},{},{})",
@@ -91,6 +86,7 @@ fn rgba_to_color(rgb: (u8, u8, u8), alpha: f64) -> String {
     )
 }
 
+/* This struct represents a particle with position, velocity and acceleration. */
 pub struct Particle {
     pos: TwoVec,
     vel: TwoVec,
@@ -98,14 +94,16 @@ pub struct Particle {
 }
 
 impl Particle {
-    pub const fn new(x: f64, y: f64, vel_x: f64, vel_y: f64) -> Self {
+    /* Create a particle with given postion and velocity. */
+    pub const fn new(pos: TwoVec, vel: TwoVec) -> Self {
         Self {
-            pos: TwoVec::new(x, y),
-            vel: TwoVec::new(vel_x, vel_y),
+            pos,
+            vel,
             acc: TwoVec::zero(),
         }
     }
 
+    /* Create a particle at a given point with given speed and random velocity. */
     pub fn random_at(pos: TwoVec, speed: f64) -> Particle {
         Self {
             pos: pos,
@@ -114,10 +112,12 @@ impl Particle {
         }
     }
 
+    /* Apply a force to a particle. */
     pub fn apply_force(&mut self, force: TwoVec) {
         self.acc += &force;
     }
 
+    /* Perform one step of a simulation and reset acceleration. */
     pub fn step(&mut self) {
         self.apply_force(GRAVITY);
 
@@ -127,10 +127,12 @@ impl Particle {
         self.acc = TwoVec::zero();
     }
 
+    /* Draw the particle on a canvas with a given color. */
     pub fn draw(&self, context: &CanvasRenderingContext2d, color: (u8, u8, u8), radius: f64) {
         self.draw_rgba(context, color, 1., radius);
     }
 
+    /* Draw the particle on a canvas with a given color and translucency. */
     pub fn draw_rgba(
         &self,
         context: &CanvasRenderingContext2d,
@@ -145,12 +147,10 @@ impl Particle {
         )));
 
         context
-            .ellipse(
+            .arc(
                 self.pos.x(),
                 self.pos.y(),
                 radius,
-                radius,
-                0.,
                 0.,
                 std::f64::consts::TAU,
             )

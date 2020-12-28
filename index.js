@@ -4,7 +4,7 @@ let firework_counter = 0;
 let firework_spawner_handle = 0;
 
 /* Limit the amount of fireworks based on window width. */
-let max_fireworks = window.innerWidth / 70;
+let max_fireworks = window.innerWidth / 100;
 
 async function run() {
     await init();

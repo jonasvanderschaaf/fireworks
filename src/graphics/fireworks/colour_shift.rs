@@ -37,10 +37,12 @@ impl Rocket for ColourShiftFirework {
     fn explode(&mut self) -> () {
         self.exploded = true;
 
+        let radius = 1.5 + Math::random() * 1.5;
+
         /* Create the explosion. */
         for _ in 0..PARTICLE_COUNT {
             let mut particle =
-                Particle::random_at(self.rocket.pos().clone(), 2. + Math::random() * 0.5);
+                Particle::random_at(self.rocket.pos().clone(), radius + Math::random() * 0.5);
             particle.set_vel(particle.vel() + self.rocket.vel());
             self.particles.push(particle);
         }
@@ -64,7 +66,7 @@ impl Rocket for ColourShiftFirework {
     fn draw_explosion(&self, context: &CanvasRenderingContext2d) -> () {
         for particle in &self.particles {
             let lifetime_frac = (self.lifetime as f64) / (PARTICLE_LIFETIME as f64);
-            let colour_shift = 1. - lifetime_frac.powi(4);
+            let colour_shift = 1. - lifetime_frac.powi(6);
             let alpha = lifetime_frac.powi(2);
 
             particle.draw_rgba(

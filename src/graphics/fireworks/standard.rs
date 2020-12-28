@@ -36,10 +36,12 @@ impl Rocket for StandardFirework {
     fn explode(&mut self) -> () {
         self.exploded = true;
 
+        let radius = 1.5 + Math::random() * 1.5;
+
         /* Create the explosion. */
         for _ in 0..PARTICLE_COUNT {
             let mut particle =
-                Particle::random_at(self.rocket.pos().clone(), 2. + Math::random() * 0.5);
+                Particle::random_at(self.rocket.pos().clone(), radius + Math::random() * 0.5);
             particle.set_vel(particle.vel() + self.rocket.vel());
             self.particles.push(particle);
         }

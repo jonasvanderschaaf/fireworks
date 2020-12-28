@@ -5,7 +5,7 @@ mod sim;
 use core::panic;
 
 use js_sys::Math;
-use wasm_bindgen::JsCast;
+use wasm_bindgen::{JsCast, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
 use fireworks::{ColourShiftFirework, Firework, StandardFirework};
@@ -103,6 +103,19 @@ impl Graphics {
         for firework in &self.fireworks {
             firework.draw(&self.context);
         }
+
+        self.context.set_fill_style(&JsValue::from_str("yellow"));
+        self.context.set_text_baseline("middle");
+        self.context.set_text_align("center");
+        self.context.set_font("70px sans-serif");
+
+        self.context
+            .fill_text(
+                "Gelukkig Nieuwjaar!",
+                self.canvas.width() as f64 / 2.,
+                self.canvas.height() as f64 / 2.,
+            )
+            .unwrap();
     }
 
     /* Simulate the fireworks. */

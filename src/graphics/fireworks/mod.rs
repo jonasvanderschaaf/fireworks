@@ -11,7 +11,7 @@ const PARTICLE_COUNT: u32 = 20;
 
 const PARTICLE_LIFETIME: u32 = 70;
 
-const ROCKET_EXPLODE_SPEED: f64 = -0.5;
+const ROCKET_EXPLODE_SPEED: f64 = -2.;
 
 pub const GRAVITY: TwoVec = TwoVec::new(0., 0.07);
 
@@ -90,7 +90,7 @@ where
 /* Calculate the min and max starting velocity based on screen height. */
 fn vel_min_max(height: u32) -> (f64, f64) {
     let height_root = (height as f64).sqrt();
-    (height_root / -4., height_root / -3.)
+    (height_root / -5.5, height_root / -3.)
 }
 
 pub use colour_shift::ColourShiftFirework;

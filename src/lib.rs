@@ -5,12 +5,6 @@ mod graphics;
 
 static mut GRAPHICS: Option<graphics::Graphics> = None;
 
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = console)]
-    fn log(s: &str);
-}
-
 /* Initialize the simulation. */
 #[wasm_bindgen(start)]
 pub fn start() {
@@ -39,8 +33,8 @@ pub fn start() {
 /* Draw the current state of the simulation, and simulate one step. */
 #[wasm_bindgen]
 pub fn draw() {
-    /* This is only unsafe in multithreaded contexts, but the program is
-     * entirely singlethreaded, so this is perfectly safe. */
+    /* This is only unsafe when aquiring multiple muteable references,
+     * but the reference is immediately dropped, so this is safe. */
     if let Some(graphics) = unsafe { GRAPHICS.as_mut() } {
         graphics.step();
 
@@ -51,9 +45,23 @@ pub fn draw() {
 /* Spawn a new firework. */
 #[wasm_bindgen]
 pub fn spawn_firework() {
-    /* This is only unsafe in multithreaded contexts, but the program is
-     * entirely singlethreaded, so this is perfectly safe. */
+    /* This is only unsafe when aquiring multiple muteable references,
+     * but the reference is immediately dropped, so this is safe. */
     if let Some(graphics) = unsafe { GRAPHICS.as_mut() } {
         graphics.spawn_firework();
+    }
+}
+
+#[wasm_bindgen]
+pub fn resize_canvas() {
+    /* This is only unsafe when aquiring multiple muteable references,
+     * but the reference is immediately dropped, so this is safe. */
+    if let Some(graphics) = unsafe { GRAPHICS.as_mut() } {
+        let window = web_sys::window().unwrap();
+
+        graphics.resize(
+            window.inner_width().unwrap().as_f64().unwrap() as u32,
+            window.inner_height().unwrap().as_f64().unwrap() as u32,
+        );
     }
 }

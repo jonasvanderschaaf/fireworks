@@ -1,10 +1,10 @@
-import init, { draw, spawn_firework } from './pkg/new_years.js';
+import init, { draw, spawn_firework, resize_canvas } from './pkg/new_years.js';
 
 let firework_counter = 0;
-var firework_spawner_handle = 0;
+let firework_spawner_handle = 0;
 
 /* Limit the amount of fireworks based on window width. */
-let max_fireworks = window.innerWidth / 100;
+let max_fireworks = window.innerWidth / 70;
 
 async function run() {
     await init();
@@ -23,6 +23,10 @@ async function run() {
         /* Spawn fireworks in regular intervals such that the maximum is reached
          * in 5 seconds. */
     }, 5000 / max_fireworks);
+
+    window.onresize = (event) => {
+        resize_canvas()
+    };
 }
 
 run();

@@ -20,3 +20,6 @@ features = [
   'HtmlCanvasElement',
   'Window',
 ]
+
+[profile.release]
+lto = true

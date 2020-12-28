@@ -1,23 +1,24 @@
+mod colour;
 mod fireworks;
 mod sim;
+
+use core::panic;
 
 use js_sys::Math;
 use wasm_bindgen::JsCast;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-use fireworks::Firework;
+use fireworks::{ColourShiftFirework, Firework, StandardFirework};
 use sim::{Particle, TwoVec};
 
 const STAR_RADIUS: f64 = 2.;
 const STAR_COUNT: u32 = 20;
 
-const YELLOW: (u8, u8, u8) = (200, 200, 0);
-
 pub struct Graphics {
     canvas: HtmlCanvasElement,
     context: CanvasRenderingContext2d,
     stars: Vec<Particle>,
-    fireworks: Vec<Firework>,
+    fireworks: Vec<Box<dyn Firework>>,
 }
 
 impl Graphics {
@@ -41,6 +42,23 @@ impl Graphics {
         }
     }
 
+    pub fn resize(&mut self, width: u32, height: u32) {
+        let (old_width, old_height) = (self.canvas.width(), self.canvas.height());
+        let width_ratio = width as f64 / old_width as f64;
+        let height_ratio = height as f64 / old_height as f64;
+
+        for star in &mut self.stars {
+            let old_pos = star.pos();
+
+            let (new_x, new_y) = (old_pos.x() * width_ratio, old_pos.y() * height_ratio);
+
+            star.set_pos(TwoVec::new(new_x, new_y));
+        }
+
+        self.canvas.set_width(width);
+        self.canvas.set_height(height);
+    }
+
     /* Create the stars. */
     pub fn init(&mut self) {
         // Generate the stars
@@ -48,8 +66,23 @@ impl Graphics {
     }
 
     pub fn spawn_firework(&mut self) {
-        self.fireworks
-            .push(Firework::new(self.canvas.width(), self.canvas.height()));
+        match self.fireworks.len() % 2 {
+            0 => {
+                self.fireworks.push(Box::from(StandardFirework::new(
+                    self.canvas.width(),
+                    self.canvas.height(),
+                )));
+            }
+            1 => {
+                self.fireworks.push(Box::from(ColourShiftFirework::new(
+                    self.canvas.width(),
+                    self.canvas.height(),
+                )));
+            }
+            _ => {
+                panic!("This shouldn't happen ever.");
+            }
+        }
     }
 
     /* Draw the firework and stars. */
@@ -96,7 +129,7 @@ impl Graphics {
     /* This function draws the stars on the canvas. */
     fn draw_stars(&self) {
         for star in &self.stars {
-            star.draw(&self.context, YELLOW, STAR_RADIUS);
+            star.draw(&self.context, colour::YELLOW, STAR_RADIUS);
         }
     }
 }

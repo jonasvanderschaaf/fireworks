@@ -4,7 +4,7 @@ use std::ops::{Add, AddAssign, Sub};
 use js_sys::Math;
 use web_sys::CanvasRenderingContext2d;
 
-const GRAVITY: TwoVec = TwoVec::new(0., 0.07);
+use super::colour::Colour;
 
 #[derive(Clone, Copy)]
 pub struct TwoVec {
@@ -76,7 +76,7 @@ impl Into<(f64, f64)> for &TwoVec {
 }
 
 /* Convert an rgb triple and alpha value to a CSS colour. */
-fn rgba_to_color(rgb: (u8, u8, u8), alpha: f64) -> String {
+fn rgba_to_color(rgb: Colour, alpha: f64) -> String {
     format!(
         "rgba({},{},{},{})",
         rgb.0,
@@ -119,8 +119,6 @@ impl Particle {
 
     /* Perform one step of a simulation and reset acceleration. */
     pub fn step(&mut self) {
-        self.apply_force(GRAVITY);
-
         self.vel += &self.acc;
         self.pos += &self.vel;
 
@@ -128,7 +126,7 @@ impl Particle {
     }
 
     /* Draw the particle on a canvas with a given color. */
-    pub fn draw(&self, context: &CanvasRenderingContext2d, color: (u8, u8, u8), radius: f64) {
+    pub fn draw(&self, context: &CanvasRenderingContext2d, color: Colour, radius: f64) {
         self.draw_rgba(context, color, 1., radius);
     }
 
@@ -136,7 +134,7 @@ impl Particle {
     pub fn draw_rgba(
         &self,
         context: &CanvasRenderingContext2d,
-        color: (u8, u8, u8),
+        color: Colour,
         alpha: f64,
         radius: f64,
     ) {

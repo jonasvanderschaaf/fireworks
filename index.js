@@ -24,6 +24,7 @@ async function run() {
          * in 5 seconds. */
     }, 5000 / max_fireworks);
 
+    /* Change the canvas resolution when the window is resized. */
     window.onresize = (event) => {
         resize_canvas()
     };

@@ -65,6 +65,7 @@ impl Graphics {
         self.create_stars(STAR_COUNT, self.canvas.width(), self.canvas.height());
     }
 
+    /* Spawn a firework, depending on what types of firework there are. */
     pub fn spawn_firework(&mut self) {
         match self.fireworks.len() % 2 {
             0 => {

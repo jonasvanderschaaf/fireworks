@@ -11,6 +11,8 @@ const PARTICLE_COUNT: u32 = 20;
 
 const PARTICLE_LIFETIME: u32 = 70;
 
+const ROCKET_EXPLODE_SPEED: f64 = -0.5;
+
 pub const GRAVITY: TwoVec = TwoVec::new(0., 0.07);
 
 pub trait Firework {
@@ -60,13 +62,14 @@ where
         self.reset_explosion();
     }
 
+    /* Simulate one step of the rocket. */
     fn step(&mut self, width: u32, height: u32) -> () {
         if !self.exploded() {
             self.rocket_mut().apply_force(GRAVITY);
             self.rocket_mut().step();
 
             /* If the rocket is at the top of its arc, explode it. */
-            if self.rocket().vel().y() > 0. {
+            if self.rocket().vel().y() > ROCKET_EXPLODE_SPEED {
                 self.explode();
             }
         } else {
@@ -74,6 +77,7 @@ where
         }
     }
 
+    /* Draw the rocket or its explosion. */
     fn draw(&self, context: &CanvasRenderingContext2d) -> () {
         if !self.exploded() {
             self.rocket().draw(context, colour::ORANGE, 2.3);

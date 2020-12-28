@@ -76,7 +76,7 @@ impl Into<(f64, f64)> for &TwoVec {
 }
 
 /* Convert an rgb triple and alpha value to a CSS colour. */
-fn rgba_to_color(rgb: Colour, alpha: f64) -> String {
+fn rgba_to_colour(rgb: Colour, alpha: f64) -> String {
     format!(
         "rgba({},{},{},{})",
         rgb.0,
@@ -125,23 +125,23 @@ impl Particle {
         self.acc = TwoVec::zero();
     }
 
-    /* Draw the particle on a canvas with a given color. */
-    pub fn draw(&self, context: &CanvasRenderingContext2d, color: Colour, radius: f64) {
-        self.draw_rgba(context, color, 1., radius);
+    /* Draw the particle on a canvas with a given colour. */
+    pub fn draw(&self, context: &CanvasRenderingContext2d, colour: Colour, radius: f64) {
+        self.draw_rgba(context, colour, 1., radius);
     }
 
-    /* Draw the particle on a canvas with a given color and translucency. */
+    /* Draw the particle on a canvas with a given colour and translucency. */
     pub fn draw_rgba(
         &self,
         context: &CanvasRenderingContext2d,
-        color: Colour,
+        colour: Colour,
         alpha: f64,
         radius: f64,
     ) {
         context.begin_path();
 
-        context.set_fill_style(&wasm_bindgen::JsValue::from_str(&rgba_to_color(
-            color, alpha,
+        context.set_fill_style(&wasm_bindgen::JsValue::from_str(&rgba_to_colour(
+            colour, alpha,
         )));
 
         context
@@ -157,18 +157,22 @@ impl Particle {
         context.fill();
     }
 
+    /* Getter for the position of a particle. */
     pub fn pos(&self) -> &TwoVec {
         &self.pos
     }
 
+    /* Setter for the position. */
     pub fn set_pos(&mut self, new_pos: TwoVec) {
         self.pos = new_pos;
     }
 
+    /* Getter for the velocity. */
     pub fn vel(&self) -> &TwoVec {
         &self.vel
     }
 
+    /* Setter for the velocity. */
     pub fn set_vel(&mut self, new_vel: TwoVec) {
         self.vel = new_vel;
     }

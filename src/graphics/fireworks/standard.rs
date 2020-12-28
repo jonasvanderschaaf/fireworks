@@ -9,6 +9,7 @@ use super::{Firework, Rocket, GRAVITY, PARTICLE_COUNT, PARTICLE_LIFETIME};
 
 use super::vel_min_max;
 
+/* This struct represents a plain firework with one colour.. */
 pub struct StandardFirework {
     rocket: Particle,
     exploded: bool,
@@ -17,6 +18,7 @@ pub struct StandardFirework {
     lifetime: u32,
 }
 
+/* Implement the standard rocket behaviour for this struct. */
 impl Rocket for StandardFirework {
     fn rocket_mut(&mut self) -> &mut Particle {
         &mut self.rocket
@@ -30,17 +32,20 @@ impl Rocket for StandardFirework {
         self.exploded
     }
 
+    /* Explode the firework. */
     fn explode(&mut self) -> () {
         self.exploded = true;
 
         /* Create the explosion. */
         for _ in 0..PARTICLE_COUNT {
-            let particle =
+            let mut particle =
                 Particle::random_at(self.rocket.pos().clone(), 2. + Math::random() * 0.5);
+            particle.set_vel(particle.vel() + self.rocket.vel());
             self.particles.push(particle);
         }
     }
 
+    /* Simulate one step of the explosion. */
     fn sim_explosion(&mut self, width: u32, height: u32) -> () {
         self.particles.iter_mut().for_each(|particle| {
             particle.apply_force(GRAVITY);
@@ -54,6 +59,7 @@ impl Rocket for StandardFirework {
         }
     }
 
+    /* Draw the explosion. */
     fn draw_explosion(&self, context: &CanvasRenderingContext2d) -> () {
         for particle in &self.particles {
             particle.draw_rgba(
@@ -65,6 +71,7 @@ impl Rocket for StandardFirework {
         }
     }
 
+    /* Reset the explosion. */
     fn reset_explosion(&mut self) -> () {
         self.exploded = false;
         self.particles.clear();

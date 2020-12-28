@@ -6,8 +6,10 @@ use super::super::colour;
 use super::super::colour::Colour;
 use super::super::sim::{Particle, TwoVec};
 
-use super::{Firework, Rocket, GRAVITY, PARTICLE_COUNT, PARTICLE_LIFETIME};
+use super::{vel_min_max, Firework, Rocket, GRAVITY, PARTICLE_COUNT, PARTICLE_LIFETIME};
 
+/* This struct represents firework of which the explosion gradually changes
+ * colour over its lifetime. */
 pub struct ColourShiftFirework {
     rocket: Particle,
     exploded: bool,
@@ -17,6 +19,7 @@ pub struct ColourShiftFirework {
     lifetime: u32,
 }
 
+/* Implement the standard rocket behaviour for this struct. */
 impl Rocket for ColourShiftFirework {
     fn rocket_mut(&mut self) -> &mut Particle {
         &mut self.rocket
@@ -30,17 +33,20 @@ impl Rocket for ColourShiftFirework {
         self.exploded
     }
 
+    /* Dictate the explosion behaviour. */
     fn explode(&mut self) -> () {
         self.exploded = true;
 
         /* Create the explosion. */
         for _ in 0..PARTICLE_COUNT {
-            let particle =
+            let mut particle =
                 Particle::random_at(self.rocket.pos().clone(), 2. + Math::random() * 0.5);
+            particle.set_vel(particle.vel() + self.rocket.vel());
             self.particles.push(particle);
         }
     }
 
+    /* Simulate the explosion for one step. */
     fn sim_explosion(&mut self, width: u32, height: u32) -> () {
         self.particles.iter_mut().for_each(|particle| {
             particle.apply_force(GRAVITY);
@@ -54,6 +60,7 @@ impl Rocket for ColourShiftFirework {
         }
     }
 
+    /* Draw the explosion on a given canvas. */
     fn draw_explosion(&self, context: &CanvasRenderingContext2d) -> () {
         for particle in &self.particles {
             let lifetime_frac = (self.lifetime as f64) / (PARTICLE_LIFETIME as f64);
@@ -62,6 +69,7 @@ impl Rocket for ColourShiftFirework {
 
             particle.draw_rgba(
                 context,
+                /* Mix the two colours together in the right amount. */
                 colour::colour_add(
                     &colour::colour_mul(&self.first_colour, colour_shift),
                     &colour::colour_mul(&self.second_colour, 1. - colour_shift),
@@ -72,6 +80,7 @@ impl Rocket for ColourShiftFirework {
         }
     }
 
+    /* Reset the explosion. */
     fn reset_explosion(&mut self) -> () {
         self.exploded = false;
         self.particles.clear();
@@ -84,7 +93,7 @@ impl Rocket for ColourShiftFirework {
 impl ColourShiftFirework {
     /* Create new firework at random position on the bottom, with random colour. */
     pub fn new(width: u32, height: u32) -> Self {
-        let (vel_min, vel_max) = Self::vel_min_max(height);
+        let (vel_min, vel_max) = vel_min_max(height);
 
         Self {
             rocket: Particle::new(
@@ -97,11 +106,5 @@ impl ColourShiftFirework {
             second_colour: random_colour(),
             lifetime: PARTICLE_LIFETIME,
         }
-    }
-
-    /* Calculate the min and max starting velocity based on screen height. */
-    fn vel_min_max(height: u32) -> (f64, f64) {
-        let height_root = (height as f64).sqrt();
-        (height_root / -4., height_root / -3.)
     }
 }

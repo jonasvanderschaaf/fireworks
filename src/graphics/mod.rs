@@ -8,7 +8,7 @@ use js_sys::Math;
 use wasm_bindgen::{JsCast, JsValue};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-use fireworks::{ColourShiftFirework, Firework, StandardFirework};
+use fireworks::{ColourShiftFirework, Firework, SparkleFirework, StandardFirework};
 use sim::{Particle, TwoVec};
 
 const STAR_RADIUS: f64 = 2.;
@@ -67,7 +67,7 @@ impl Graphics {
 
     /* Spawn a firework, depending on what types of firework there are. */
     pub fn spawn_firework(&mut self) {
-        match self.fireworks.len() % 2 {
+        match self.fireworks.len() % 4 {
             0 => {
                 self.fireworks.push(Box::from(StandardFirework::new(
                     self.canvas.width(),
@@ -75,7 +75,19 @@ impl Graphics {
                 )));
             }
             1 => {
+                self.fireworks.push(Box::from(StandardFirework::new(
+                    self.canvas.width(),
+                    self.canvas.height(),
+                )));
+            }
+            2 => {
                 self.fireworks.push(Box::from(ColourShiftFirework::new(
+                    self.canvas.width(),
+                    self.canvas.height(),
+                )));
+            }
+            3 => {
+                self.fireworks.push(Box::from(SparkleFirework::new(
                     self.canvas.width(),
                     self.canvas.height(),
                 )));

@@ -1,4 +1,5 @@
 mod colour_shift;
+mod sparkle;
 mod standard;
 
 use js_sys::Math;
@@ -94,4 +95,5 @@ fn vel_min_max(height: u32) -> (f64, f64) {
 }
 
 pub use colour_shift::ColourShiftFirework;
+pub use sparkle::SparkleFirework;
 pub use standard::StandardFirework;
